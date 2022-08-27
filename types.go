@@ -49,3 +49,12 @@ type Order struct {
 	DateCreated       time.Time `json:"date_created"`
 	OofShard          string    `json:"oof_shard"`
 }
+
+type Delivery struct {
+}
+
+type Payment struct {
+}
+
+type Items struct {
+}
