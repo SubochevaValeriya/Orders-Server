@@ -26,15 +26,21 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	}
 	var id int
 
-	changeBalanceQuery := fmt.Sprintf("INSERT INTO %s (data) values ($1) RETURNING id", ordersTable)
-	row := r.db.QueryRow(changeBalanceQuery, order)
+	fmt.Println("from cr")
+	changeBalanceQuery := fmt.Sprintf("INSERT INTO %s (data) values ($1) RETURNING order_id", ordersTable)
+	jsonOrder, err := json.Marshal(order)
+	if err != nil {
+		return 0, err
+	}
+	row := r.db.QueryRow(changeBalanceQuery, jsonOrder)
 	if err := row.Scan(&id); err != nil {
 		tx.Rollback()
+		fmt.Println(err)
 		return 0, err
 	}
 
 	//m[id] = order
-
+	fmt.Println("from cr2")
 	return id, tx.Commit()
 }
 

@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-// Receiving order data from the channel and validation of format
+// Receiving order data from the channel and transfer it to the service
 func (h *Handler) createOrder(order order.Order) {
 	id, err := h.services.Order.CreateOrder(order)
 	if err != nil {
@@ -21,6 +21,7 @@ func (h *Handler) createOrder(order order.Order) {
 		"id": id})
 }
 
+//Validation of message format
 func validation(msg []byte) (order.Order, error) {
 	var order order.Order
 	if err := json.Unmarshal(msg, &order); err != nil {
