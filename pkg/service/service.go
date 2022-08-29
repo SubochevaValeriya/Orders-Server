@@ -1,16 +1,17 @@
 package service
 
 import (
+	order "http_server"
 	"http_server/pkg/repository"
 )
 
-type Balance interface {
-	CreateUser(user microservice.UsersBalances) (int, error)
-	GetBalanceById(userId int, ccy string) (microservice.UsersBalances, error)
+type Order interface {
+	CreateOrder(order order.Order) (int, error)
+	GetOrderById(orderId int) (order.Order, error)
 }
 
 type Service struct {
-	Balance
+	Order
 }
 
 func NewService(repos *repository.Repository) *Service {

@@ -1,5 +1,5 @@
-CREATE TABLE ORDER
+CREATE TABLE ORDERS
 (
-    uid serial,
-    data json,
+    order_id serial not null unique,
+    data json
 );

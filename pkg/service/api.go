@@ -1,6 +1,7 @@
 package service
 
 import (
+	order "http_server"
 	"http_server/pkg/repository"
 )
 
@@ -12,12 +13,12 @@ func newApiService(repo repository.Balance) *ApiService {
 	return &ApiService{repo: repo}
 }
 
-func (s *ApiService) CreateUser(user microservice.UsersBalances) (int, error) {
+func (s *ApiService) CreateOrder(order order.Order) (int, error) {
 
-	return s.repo.CreateUser(user)
+	return s.repo.CreateOrder(order)
 }
 
-func (s *ApiService) GetBalanceById(userId int, ccy string) (microservice.UsersBalances, error) {
+func (s *ApiService) GetOrderById(orderId int) (order.Order, error) {
 
-	return s.repo.GetBalanceById(userId, ccy)
+	return s.repo.GetOrderById(orderId)
 }

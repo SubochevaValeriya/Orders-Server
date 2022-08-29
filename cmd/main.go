@@ -25,6 +25,11 @@ func main() {
 
 	//sudo docker run --name=balance -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d --rm postgres
 	// migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable' up
+
+	//sudo docker exec -it e8c0fc42a2f9 /bin/bash
+	//psql -U postgres
+
+	//sudo docker run -p 4223:4223 -p 8223:8223 nats-streaming -p 4223 -m 8223
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),

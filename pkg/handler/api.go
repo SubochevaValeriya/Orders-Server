@@ -1,44 +1,49 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	order "http_server"
 	"net/http"
 	"strconv"
 )
 
-func (h *Handler) createUser(c *gin.Context) {
-	//INSERT
-	var input microservice.UsersBalances
-
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	id, err := h.services.Balance.CreateUser(input)
+// Receiving order data from the channel and validation of format
+func (h *Handler) createOrder(order order.Order) {
+	id, err := h.services.Order.CreateOrder(order)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
+		logrus.Error(http.StatusInternalServerError)
 	}
 
-	c.JSON(http.StatusOK, map[string]int{
-		"id": id,
-	})
+	logrus.Println(http.StatusOK, map[string]int{
+		"id": id})
 }
 
-func (h *Handler) getBalanceByID(c *gin.Context) {
-	userId, err := strconv.Atoi(c.Param("id"))
+func validation(msg []byte) (order.Order, error) {
+	var order order.Order
+	if err := json.Unmarshal(msg, &order); err != nil {
+		fmt.Println(err)
+		return order, fmt.Errorf("unappropriate format: %w", err)
+	}
+
+	fmt.Println("from valid")
+	return order, nil
+}
+
+// API for getting Order by Id (will be used in web app)
+func (h *Handler) getOrderByID(c *gin.Context) {
+	orderId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 	}
 
-	ccy := c.Param("ccy")
-
-	list, err := h.services.Balance.GetBalanceById(userId, ccy)
+	order, err := h.services.Order.GetOrderById(orderId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, list)
+	c.JSON(http.StatusOK, order)
 }

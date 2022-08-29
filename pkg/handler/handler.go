@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	handler "http_server/pkg/handler/nats-streaming"
 	"http_server/pkg/service"
 )
 
@@ -18,11 +20,18 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		api.POST("/", h.createUser)
-		api.GET("/:id", h.getBalanceByID)
+		//api.POST("/", h.createOrder)
+		api.GET("/:id", h.getOrderByID)
 	}
 
-	// но сейчас у меня всё по таблице balance, а можно ещё добавить по транзакциям, будет ещё один сет апи
+	msg, err := handler.Subscription()
+	if err != nil {
+	}
 
+	if order, err := validation(msg); err == nil {
+		fmt.Println("hehe")
+		h.createOrder(order)
+	}
+	fmt.Println()
 	return router
 }

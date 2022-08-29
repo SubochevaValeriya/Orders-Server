@@ -1,8 +1,9 @@
-package server
+package order
 
 import "time"
 
 type Order struct {
+	Id          int    `json:"order_id" db:"order_id"`
 	OrderUID    string `json:"order_uid"`
 	TrackNumber string `json:"track_number"`
 	Entry       string `json:"entry"`

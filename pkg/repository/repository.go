@@ -2,11 +2,12 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	order "http_server"
 )
 
 type Balance interface {
-	CreateUser(user microservice.UsersBalances) (int, error)
-	GetBalanceById(userId int) (microservice.UsersBalances, error)
+	CreateOrder(order order.Order) (int, error)
+	GetOrderById(orderId int) (order.Order, error)
 }
 
 type Repository struct {
