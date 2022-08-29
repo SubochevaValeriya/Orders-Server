@@ -1,4 +1,4 @@
-package http_server
+package server
 
 import "time"
 
@@ -48,13 +48,4 @@ type Order struct {
 	SmID              int       `json:"sm_id"`
 	DateCreated       time.Time `json:"date_created"`
 	OofShard          string    `json:"oof_shard"`
-}
-
-type Delivery struct {
-}
-
-type Payment struct {
-}
-
-type Items struct {
 }
