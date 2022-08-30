@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	Port              = ":4223"
+	Port              = ":4222"
 	ClusterID         = "test-cluster"
 	ClientID          = "test-client"
 	ChannelName       = "order-channel"

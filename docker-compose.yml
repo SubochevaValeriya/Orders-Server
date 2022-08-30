@@ -5,7 +5,7 @@ services:
     build: ./
     command: ./wait-for-postgres.sh db ./orders-app
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
     environment:
@@ -19,10 +19,10 @@ services:
     environment:
       - POSTGRES_PASSWORD=qwerty
     ports:
-      - 5432:5432
+      - "5432:5432"
 
   nats-streaming:
     restart: always
     image: nats-streaming:latest
     ports:
-      - 4223:4223
+      - "4222:4222"
