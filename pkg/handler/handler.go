@@ -17,14 +17,15 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	//Load HTML Template
 	router.LoadHTMLGlob("/home/valeriya/Документы/GitHub/http-server/pkg/handler/templates/*.html")
 	search := router.GET("/search", h.searchHandler)
 	api := router.Group("/api")
 	{
 		//api.POST("/", h.createOrder)
-		api.GET("/:id", h.getOrderByID)
+		api.GET("", h.getOrderByID)
 	}
-
+	//Adding CSS template
 	search.Static("/templates", "/home/valeriya/Документы/GitHub/http-server/pkg/handler/templates/")
 
 	msg, err := handler.Subscription()

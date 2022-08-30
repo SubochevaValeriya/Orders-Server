@@ -35,7 +35,7 @@ func validation(msg []byte) (order.Order, error) {
 
 // API for getting Order by Id (will be used in web app)
 func (h *Handler) getOrderByID(c *gin.Context) {
-	orderId, err := strconv.Atoi(c.Param("id"))
+	orderId, err := strconv.Atoi(c.Query("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 	}
@@ -66,5 +66,4 @@ func (h *Handler) searchHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", gin.H{
 		"title": "Main website",
 	})
-	//tpl.ExecuteTemplate(c, "index.templates", nil)
 }

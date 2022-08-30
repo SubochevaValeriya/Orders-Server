@@ -1,32 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html>-->
-<!--<body>-->
-
-<!--<h2>Search Order by Id</h2><br>-->
-<!--  <link rel="stylesheet" href="/templates/css/style.css">-->
-<!--<form action="http://localhost:8000/api/" method="get">-->
-<!--    <div>-->
-<!--        <label>Please input order id</label>-->
-<!--        <input name="id" id="id" value="Hi">-->
-<!--    </div>-->
-<!--    <div>-->
-<!--        <button>Get order data</button>-->
-<!--    </div>-->
-<!--</form>-->
-<!--</body>-->
-<!--</html>-->
-
-<!--<form action="http://localhost:8000/api/" method="get">-->
-<!--    <div>-->
-<!--        <label for="id">Please input order id</label>-->
-<!--        <input name="id" id="id" value="Hi">-->
-<!--    </div>-->
-<!--    <div>-->
-<!--        <button>Get order data</button>-->
-<!--    </div>-->
-<!--</form>-->
-
-
 <!DOCTYPE templates>
 <templates lang="en" >
 <head>
@@ -41,7 +12,7 @@
     <p class="search__title">
        Search Order by Id
     </p>
-    <form action="http://localhost:8000/api/" method="get">
+    <form action="/api" method="get">
 <!--        <div>-->
 <!--            <label>Please input order id</label>-->
 <!--            <input name="id" id="id" value="Hi">-->
@@ -49,7 +20,7 @@
 <!--        <div>-->
 <!--            <button>Get order data</button>-->
 <!--        </div>-->
-        <input class="search__input" type="text" placeholder="Order Id">
+        <input name="id" id="id" value="" class="search__input" type="text" placeholder="Order Id">
 
 </div>
 
