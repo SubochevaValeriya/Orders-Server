@@ -12,11 +12,11 @@ services:
     environment:
 #     username: "postgres"
       host: db
+      #host_nats: nats-streaming
       host_nats: nats-streaming
       DB_PASSWORD: qwerty
       DB_DSN: 'postgres://user:password@db:5432/utp'
-#    networks:
-#        - my-network
+    networks: ["nats"]
 
   #      port: "5432"
 #      dbname: "postgres"
@@ -39,17 +39,14 @@ services:
       POSTGRES_PASSWORD: qwerty
     ports:
       - "5432:5432"
-#    networks:
-#          - my-network
+    networks: ["nats"]
 
   nats-streaming:
     restart: always
     image: nats-streaming:latest
     ports:
       - "4222:4222"
-#    networks:
-#      - my-network
-#
-#networks:
-#  my-network:
-#    external: true
+    networks: ["nats"]
+networks:
+  nats:
+    name: nats

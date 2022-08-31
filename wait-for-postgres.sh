@@ -7,7 +7,7 @@ host="$1"
 shift
 cmd="$@"
 
-sleep 25s #for nats_streaming
+sleep 5s #for nats_streaming
 until PGPASSWORD=$DB_PASSWORD psql -h "$host" -U "postgres" -c '\q'; do
   >&2 echo "Postgres is unavailable - sleeping"
   sleep 1

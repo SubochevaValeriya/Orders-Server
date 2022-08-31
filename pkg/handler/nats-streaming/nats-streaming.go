@@ -19,7 +19,7 @@ const (
 //Subscription to a channel and receiving data from it
 
 func Subscription() ([]byte, error) {
-	sc, err := stan.Connect(ClusterID, ClientID, stan.NatsURL(fmt.Sprintf("nats://%v%v", viper.GetString("db.host_nats"), Port)))
+	sc, err := stan.Connect(ClusterID, ClientID, stan.NatsURL(fmt.Sprintf("nats://%v%v", viper.GetString("nats-streaming.host_nats"), Port)))
 	if err != nil {
 		logrus.Fatalf("can't connect to Nats Streaming channel (subscription): %s", err)
 	}
