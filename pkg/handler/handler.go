@@ -18,7 +18,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	//Load HTML Template
-	router.LoadHTMLGlob("/home/valeriya/Документы/GitHub/http-server/pkg/handler/templates/*.html")
+	///home/valeriya/Документы/GitHub/http-server/pkg/handler/templates/*.html
+	router.LoadHTMLGlob("./templates/*.html")
 	search := router.GET("/search", h.searchHandler)
 	api := router.Group("/api")
 	{
@@ -26,7 +27,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		api.GET("", h.getOrderByID)
 	}
 	//Adding CSS template
-	search.Static("/templates", "/home/valeriya/Документы/GitHub/http-server/pkg/handler/templates/")
+	search.Static("/templates", "./templates/")
 
 	msg, err := handler.Subscription()
 	if err != nil {

@@ -1,15 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/nats-io/stan.go"
+	"github.com/nats-io/stan.go/pb"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	server "http_server"
 	"http_server/pkg/handler"
 	"http_server/pkg/repository"
 	"http_server/pkg/service"
+	"log"
 	"os"
+)
+
+const (
+	Port        = ":4222"
+	ClusterID   = "test-cluster"
+	ClientID    = "test-client"
+	ChannelName = "order-channel"
 )
 
 func main() {
@@ -47,10 +58,30 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	srv := new(server.Server)
+
+	sc, err := stan.Connect(ClusterID, ClientID, stan.NatsURL(fmt.Sprintf("nats://%v%v", viper.GetString("db.host_nats"), Port)))
+	if err != nil {
+		logrus.Fatalf("can't connect to Nats Streaming channel (subscription): %s", err)
+	}
+
+	startOpt := stan.StartAt(pb.StartPosition_NewOnly)
+
+	subj, i := ":4222", 0
+	mcb := func(msg *stan.Msg) {
+		i++
+		println(msg, i)
+	}
+
+	_, err = sc.QueueSubscribe(subj, "qgroup", mcb, startOpt, stan.DurableName(""))
+	if err != nil {
+		sc.Close()
+		log.Fatal(err)
+	}
+
+	log.Printf("Listening o")
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logrus.Fatalf("error occured while running http server: %s", err.Error())
 	}
-
 }
 
 func initConfig() error {

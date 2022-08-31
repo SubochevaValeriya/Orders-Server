@@ -6,3 +6,7 @@ db:
   port: "5432"
   dbname: "postgres"
   sslmode: "disable"
+  host: "localhost"
+
+nats-streaming:
+  host_nats: "localhost"

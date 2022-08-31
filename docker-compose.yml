@@ -8,8 +8,25 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - nats-streaming
     environment:
-      - DB_PASSWORD=qwerty
+#     username: "postgres"
+      host: db
+      host_nats: nats-streaming
+      DB_PASSWORD: qwerty
+      DB_DSN: 'postgres://user:password@db:5432/utp'
+#    networks:
+#        - my-network
+
+  #      port: "5432"
+#      dbname: "postgres"
+#      sslmode: "disable"
+#
+#      DB_HOST: db
+#      DB_PORT: 5432
+#      DB_USER: postgres
+#      DB_PASSWORD: qwerty
+#      DB_NAME: postgres
 
   db:
     restart: always
@@ -17,12 +34,22 @@ services:
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=qwerty
+      POSTGRES_DB: utp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: qwerty
     ports:
       - "5432:5432"
+#    networks:
+#          - my-network
 
   nats-streaming:
     restart: always
     image: nats-streaming:latest
     ports:
       - "4222:4222"
+#    networks:
+#      - my-network
+#
+#networks:
+#  my-network:
+#    external: true
