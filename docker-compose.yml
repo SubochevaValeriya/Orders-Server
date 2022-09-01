@@ -9,10 +9,11 @@ services:
     depends_on:
       - db
       - nats-streaming
+      - redis
     environment:
 #     username: "postgres"
       host: db
-      #host_nats: nats-streaming
+      host_cash: redis
       host_nats: nats-streaming
       DB_PASSWORD: qwerty
       DB_DSN: 'postgres://user:password@db:5432/utp'
@@ -47,6 +48,12 @@ services:
     ports:
       - "4222:4222"
     networks: ["nats"]
+  redis:
+      restart: always
+      image: redis:latest
+      ports:
+        - "6379:6379"
+      networks: [ "nats" ]
 networks:
   nats:
     name: nats

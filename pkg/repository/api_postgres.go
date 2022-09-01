@@ -41,8 +41,13 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	}
 
 	err = tx.Commit()
+
 	if err != nil {
-		r.cash.Set(string(id), order, 1000*time.Minute)
+		value, err := json.Marshal(order)
+		if err != nil {
+			return id, err
+		}
+		r.cash.Set(string(id), value, 1000*time.Minute)
 	}
 
 	fmt.Println("from cr2")
@@ -51,7 +56,8 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 
 func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
 	var order order.Order
-	orderCash, err := r.cash.Get("orderId").Bytes()
+	orderCash, err := r.cash.Get(string(orderId)).Bytes()
+	fmt.Println(string(orderCash))
 	if err == nil {
 		fmt.Println("we found!")
 		err := json.Unmarshal(orderCash, &order)

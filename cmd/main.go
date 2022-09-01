@@ -47,7 +47,7 @@ func main() {
 	})
 
 	cash, err := repository.NewRedisDB(repository.ConfigRedis{
-		Host:     viper.GetString("cash.host"),
+		Host:     viper.GetString("cash.host_cash"),
 		Port:     viper.GetString("cash.port"),
 		Password: "",
 		DBName:   viper.GetInt("cash.dbname"),
@@ -92,20 +92,3 @@ func initConfig() error {
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }
-
-//var tpl *template.Template
-//
-//func templates() error {
-//	tpl, err := template.ParseGlob("/home/valeriya/Документы/GitHub/http-server/templates/index.templates")
-//	if err != nil {
-//		return fmt.Errorf("error while parse templates template: %w", err)
-//	}
-//
-//	tpl.ExecuteTemplate()
-//
-//}
-//
-//func searchHandler(w http.ResponseWriter, r *http.Request) {
-//	fmt.Println("***searchHandler is running***")
-//	tpl.ExecuteTemplate(w, "index.templates", nil)
-//}

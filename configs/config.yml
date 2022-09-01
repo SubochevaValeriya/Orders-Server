@@ -8,11 +8,12 @@ db:
   sslmode: "disable"
 
 cash:
-  host: "localhost"
+  host_cash: "localhost"
   port: "6379"
   password: ""
   dbname: "0"
 
 nats-streaming:
+  port: 4222
   host_nats: "localhost"
 
