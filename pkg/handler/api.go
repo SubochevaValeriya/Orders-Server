@@ -33,7 +33,7 @@ func validation(msg []byte) (order.Order, error) {
 	return order, nil
 }
 
-// API for getting Order by Id (will be used in web app)
+// API for getting Order by Id (used in web app)
 func (h *Handler) getOrderByID(c *gin.Context) {
 	orderId, err := strconv.Atoi(c.Query("id"))
 	if err != nil {

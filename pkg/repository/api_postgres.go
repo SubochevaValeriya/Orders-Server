@@ -20,6 +20,7 @@ func NewApiPostgres(db *sqlx.DB, cash *redis.Client) *ApiPostgres {
 		cash: cash}
 }
 
+//Add order to DB and to cash
 func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	tx, err := r.db.Beginx()
 	if err != nil {
@@ -54,6 +55,7 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	return id, tx.Commit()
 }
 
+//Ger order from cash or from db (and add to cash)
 func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
 	var order order.Order
 	orderCash, err := r.cash.Get(string(orderId)).Bytes()
