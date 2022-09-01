@@ -1,19 +1,20 @@
 package repository
 
 import (
+	"github.com/go-redis/redis"
 	"github.com/jmoiron/sqlx"
 	order "http_server"
 )
 
-type Balance interface {
+type Order interface {
 	CreateOrder(order order.Order) (int, error)
 	GetOrderById(orderId int) (order.Order, error)
 }
 
 type Repository struct {
-	Balance
+	Order
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{NewApiPostgres(db)}
+func NewRepository(db *sqlx.DB, cash *redis.Client) *Repository {
+	return &Repository{NewApiPostgres(db, cash)}
 }

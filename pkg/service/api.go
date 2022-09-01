@@ -6,10 +6,10 @@ import (
 )
 
 type ApiService struct {
-	repo repository.Balance
+	repo repository.Order
 }
 
-func newApiService(repo repository.Balance) *ApiService {
+func newApiService(repo repository.Order) *ApiService {
 	return &ApiService{repo: repo}
 }
 

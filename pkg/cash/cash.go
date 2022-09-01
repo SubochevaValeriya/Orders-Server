@@ -1,6 +1,7 @@
-package service
+package cash
 
 import (
+	"github.com/jmoiron/sqlx"
 	order "http_server"
 	"http_server/pkg/repository"
 )
@@ -10,10 +11,10 @@ type Order interface {
 	GetOrderById(orderId int) (order.Order, error)
 }
 
-type Service struct {
+type Cash struct {
 	Order
 }
 
-func NewService(repos *repository.Repository) *Service {
-	return &Service{newApiService(repos.Order)}
+func NewCash(repos *repository.Repository) *Cash {
+	return &Cash{newCashInMemory(),
 }

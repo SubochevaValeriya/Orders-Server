@@ -37,7 +37,7 @@ func main() {
 	//psql -U postgres
 
 	//sudo docker run -p 4223:4223 -p 8223:8223 nats-streaming -p 4223 -m 8223
-	db, err := repository.NewPostgresDB(repository.Config{
+	db, err := repository.NewPostgresDB(repository.ConfigPostgres{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -45,12 +45,19 @@ func main() {
 		DBName:   viper.GetString("db.dbname"),
 		SSLMode:  viper.GetString("db.sslmode"),
 	})
+
+	cash, err := repository.NewRedisDB(repository.ConfigRedis{
+		Host:     viper.GetString("cash.host"),
+		Port:     viper.GetString("cash.port"),
+		Password: "",
+		DBName:   viper.GetInt("cash.dbname"),
+	})
 	if err != nil {
 		logrus.Fatalf("failed to inititalize db: %s", err.Error())
 	}
 
 	// dependency injection
-	repos := repository.NewRepository(db)
+	repos := repository.NewRepository(db, cash)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	srv := new(server.Server)

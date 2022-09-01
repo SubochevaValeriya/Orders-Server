@@ -3,20 +3,21 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-redis/redis"
 	"github.com/jmoiron/sqlx"
 	order "http_server"
+	"time"
 )
 
 type ApiPostgres struct {
-	db *sqlx.DB
+	db   *sqlx.DB
+	cash *redis.Client
 }
 
-func NewApiPostgres(db *sqlx.DB) *ApiPostgres {
-	return &ApiPostgres{db: db}
-}
-
-func newCashMap() map[int]order.Order {
-	return map[int]order.Order{}
+func NewApiPostgres(db *sqlx.DB, cash *redis.Client) *ApiPostgres {
+	return &ApiPostgres{
+		db:   db,
+		cash: cash}
 }
 
 func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
@@ -39,25 +40,51 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 		return 0, err
 	}
 
-	//m[id] = order
+	err = tx.Commit()
+	if err != nil {
+		r.cash.Set(string(id), order, 1000*time.Minute)
+	}
+
 	fmt.Println("from cr2")
 	return id, tx.Commit()
 }
 
 func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
-	//if data, ok := m[orderId]; ok{
-	//	return data, nil
-	//}
+	var order order.Order
+	orderCash, err := r.cash.Get("orderId").Bytes()
+	if err == nil {
+		fmt.Println("we found!")
+		err := json.Unmarshal(orderCash, &order)
+		return order, err
+	}
 
-	//var row order.Order
+	fmt.Println("not found((")
 	var row string
 	query := fmt.Sprintf("SELECT (data) FROM %s WHERE order_id=$1", ordersTable)
-	err := r.db.Get(&row, query, orderId)
-	var order order.Order
-	json.Unmarshal([]byte(row), &order)
+	err = r.db.Get(&row, query, orderId)
 	if err != nil {
 		return order, fmt.Errorf("error while trying to get order by Id from DB: %w", err)
 	}
 
+	err = json.Unmarshal([]byte(row), &order)
+	p := r.cash.Set(string(orderId), row, 1000*time.Minute)
+	fmt.Println(p.Result())
+	//.Err() != nil {
+	//	return order, fmt.Errorf("can't add order to Cash: %w", err)
+	//}
+
 	return order, err
+
+	//if data, ok := m[orderId]; ok{
+	//	return data, nil
+	//}
+	//
+	//var row order.Order
+	//query := fmt.Sprintf("SELECT (data) FROM %s WHERE order_id=$1", ordersTable)
+	//err = r.db.Get(&row, query, orderId)
+	//if err != nil {
+	//	return order, fmt.Errorf("error while trying to get order by Id from DB: %w", err)
+	//}
+	//err = json.Unmarshal([]byte(row), &order)
+	//return order, err
 }
