@@ -41,12 +41,12 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	}
 
 	err = tx.Commit()
-	if err != nil {
+	if err == nil {
 		value, err := json.Marshal(order)
 		if err != nil {
 			return id, err
 		}
-		set := r.cache.Set(string(id), value, 1000*time.Minute)
+		set := r.cache.Set(string(id), value, 10*time.Minute)
 		if _, err := set.Result(); err == nil {
 			logrus.Println("order was added to the cache")
 		}
