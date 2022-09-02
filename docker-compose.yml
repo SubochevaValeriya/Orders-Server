@@ -41,7 +41,7 @@ services:
       - POSTGRES_PASSWORD=qwerty
     ports:
       - "5432:5432"
-   # networks: [ "nats"
+   # networks: [ "nats"]
 
   nats-streaming:
     restart: always
