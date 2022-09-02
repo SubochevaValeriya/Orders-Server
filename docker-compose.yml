@@ -9,25 +9,25 @@ services:
     depends_on:
       - db
       - nats-streaming
-      - cash
+      - cache
     environment:
-#     username: "postgres"
+      #     username: "postgres"
       host: db
       host_cache: cache
       host_nats: nats-streaming
       DB_PASSWORD: qwerty
       DB_DSN: 'postgres://user:password@db:5432/utp'
-    networks: ["nats"]
+    networks: [ "nats" ]
 
   #      port: "5432"
-#      dbname: "postgres"
-#      sslmode: "disable"
-#
-#      DB_HOST: db
-#      DB_PORT: 5432
-#      DB_USER: postgres
-#      DB_PASSWORD: qwerty
-#      DB_NAME: postgres
+  #      dbname: "postgres"
+  #      sslmode: "disable"
+  #
+  #      DB_HOST: db
+  #      DB_PORT: 5432
+  #      DB_USER: postgres
+  #      DB_PASSWORD: qwerty
+  #      DB_NAME: postgres
 
   db:
     restart: always
@@ -40,14 +40,14 @@ services:
       POSTGRES_PASSWORD: qwerty
     ports:
       - "5432:5432"
-    networks: ["nats"]
+    networks: [ "nats" ]
 
   nats-streaming:
     restart: always
     image: nats-streaming:latest
     ports:
       - "4222:4222"
-    networks: ["nats"]
+    networks: [ "nats" ]
   cache:
     image: redis:6.2-alpine
     restart: always
@@ -56,7 +56,7 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
       - ./cache:/data
-    networks: ["nats"]
+    networks: [ "nats" ]
 networks:
   nats:
     name: nats
