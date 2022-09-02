@@ -21,4 +21,5 @@ func (s *ApiService) CreateOrder(order order.Order) (int, error) {
 func (s *ApiService) GetOrderById(orderId int) (order.Order, error) {
 
 	return s.repo.GetOrderById(orderId)
+
 }

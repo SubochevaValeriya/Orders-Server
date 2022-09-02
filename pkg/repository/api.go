@@ -5,22 +5,23 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	order "http_server"
 	"time"
 )
 
 type ApiPostgres struct {
-	db   *sqlx.DB
-	cash *redis.Client
+	db    *sqlx.DB
+	cache *redis.Client
 }
 
-func NewApiPostgres(db *sqlx.DB, cash *redis.Client) *ApiPostgres {
+func NewApiPostgres(db *sqlx.DB, cache *redis.Client) *ApiPostgres {
 	return &ApiPostgres{
-		db:   db,
-		cash: cash}
+		db:    db,
+		cache: cache}
 }
 
-//Add order to DB and to cash
+//CreateOrder adds order to DB and to cache
 func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	tx, err := r.db.Beginx()
 	if err != nil {
@@ -28,7 +29,6 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	}
 	var id int
 
-	fmt.Println("from cr")
 	changeBalanceQuery := fmt.Sprintf("INSERT INTO %s (data) values ($1) RETURNING order_id", ordersTable)
 	jsonOrder, err := json.Marshal(order)
 	if err != nil {
@@ -37,7 +37,6 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	row := r.db.QueryRow(changeBalanceQuery, jsonOrder)
 	if err := row.Scan(&id); err != nil {
 		tx.Rollback()
-		fmt.Println(err)
 		return 0, err
 	}
 
@@ -48,25 +47,23 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 		if err != nil {
 			return id, err
 		}
-		r.cash.Set(string(id), value, 1000*time.Minute)
+		r.cache.Set(string(id), value, 1000*time.Minute)
 	}
 
-	fmt.Println("from cr2")
 	return id, tx.Commit()
 }
 
-//Ger order from cash or from db (and add to cash)
+//GetOrderById gets order from cache or from db (and add to cache)
 func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
 	var order order.Order
-	orderCash, err := r.cash.Get(string(orderId)).Bytes()
+	orderCash, err := r.cache.Get(string(orderId)).Bytes()
 	fmt.Println(string(orderCash))
 	if err == nil {
-		fmt.Println("we found!")
+		logrus.Println("order was found in the cache")
 		err := json.Unmarshal(orderCash, &order)
 		return order, err
 	}
 
-	fmt.Println("not found((")
 	var row string
 	query := fmt.Sprintf("SELECT (data) FROM %s WHERE order_id=$1", ordersTable)
 	err = r.db.Get(&row, query, orderId)
@@ -75,24 +72,10 @@ func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
 	}
 
 	err = json.Unmarshal([]byte(row), &order)
-	p := r.cash.Set(string(orderId), row, 1000*time.Minute)
-	fmt.Println(p.Result())
-	//.Err() != nil {
-	//	return order, fmt.Errorf("can't add order to Cash: %w", err)
-	//}
+	p := r.cache.Set(string(orderId), row, 1000*time.Minute)
+	if _, err := p.Result(); err == nil {
+		logrus.Println("order was added to the cache")
+	}
 
 	return order, err
-
-	//if data, ok := m[orderId]; ok{
-	//	return data, nil
-	//}
-	//
-	//var row order.Order
-	//query := fmt.Sprintf("SELECT (data) FROM %s WHERE order_id=$1", ordersTable)
-	//err = r.db.Get(&row, query, orderId)
-	//if err != nil {
-	//	return order, fmt.Errorf("error while trying to get order by Id from DB: %w", err)
-	//}
-	//err = json.Unmarshal([]byte(row), &order)
-	//return order, err
 }

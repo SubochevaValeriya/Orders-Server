@@ -49,18 +49,6 @@ func (h *Handler) getOrderByID(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
-//var tpl *template.Template
-//
-//func templates() error {
-//	tpl, err := template.ParseGlob("/home/valeriya/Документы/GitHub/http-server/templates/*.templates")
-//	if err != nil {
-//		return fmt.Errorf("error while parse templates template: %w", err)
-//	}
-//
-//	tpl.ExecuteTemplate()
-//
-//}
-
 func (h *Handler) searchHandler(c *gin.Context) {
 	fmt.Println("***searchHandler is running***")
 	c.HTML(http.StatusOK, "index.html", gin.H{

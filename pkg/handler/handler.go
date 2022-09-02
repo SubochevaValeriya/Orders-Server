@@ -2,39 +2,47 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	handler "http_server/pkg/handler/nats-streaming"
+	"github.com/nats-io/stan.go"
+	"github.com/spf13/viper"
 	"http_server/pkg/service"
 )
 
 type Handler struct {
-	services *service.Service
+	services      *service.Service
+	natsStreaming stan.Conn
 }
 
-func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+func NewHandler(services *service.Service, natsStreaming stan.Conn) *Handler {
+	return &Handler{
+		services:      services,
+		natsStreaming: natsStreaming}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	//Load HTML Template
-	///home/valeriya/Документы/GitHub/http-server/pkg/handler/templates/*.html
+	//Loading HTML Template
 	router.LoadHTMLGlob("./templates/*.html")
 	search := router.GET("/search", h.searchHandler)
-	api := router.Group("/api")
-	{
-		//api.POST("/", h.createOrder)
-		api.GET("", h.getOrderByID)
-	}
+
 	//Adding CSS template
 	search.Static("/templates", "./templates/")
 
-	msg, err := handler.Subscription()
-	if err != nil {
+	//Adding API endpoint
+	api := router.Group("/api")
+	{
+		api.GET("", h.getOrderByID)
 	}
 
-	if order, err := validation(msg); err == nil {
-		h.createOrder(order)
-	}
+	//Subscribe to a channel
+	h.natsStreaming.Subscribe(viper.GetString("nats-streaming.channel_name"),
+		func(m *stan.Msg) {
+			if order, err := validation(m.Data); err == nil {
+				h.createOrder(order)
+			}
+			m.Ack()
+		},
+		stan.StartWithLastReceived())
+
 	return router
 }

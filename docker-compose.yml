@@ -13,7 +13,7 @@ services:
     environment:
 #     username: "postgres"
       host: db
-      host_cash: cash
+      host_cache: cache
       host_nats: nats-streaming
       DB_PASSWORD: qwerty
       DB_DSN: 'postgres://user:password@db:5432/utp'
@@ -48,7 +48,7 @@ services:
     ports:
       - "4222:4222"
     networks: ["nats"]
-  cash:
+  cache:
     image: redis:6.2-alpine
     restart: always
     ports:

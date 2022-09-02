@@ -14,7 +14,6 @@ type ConfigRedis struct {
 }
 
 //Connection to Redis
-//docker run --name redis-test-instance -p 6379:6379 -d redis
 func NewRedisDB(cfg ConfigRedis) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", cfg.Host, cfg.Port),

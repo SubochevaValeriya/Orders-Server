@@ -19,6 +19,13 @@ const (
 	ChannelName = "order-channel"
 )
 
+//sudo docker run --name=orders -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d --rm postgres
+//docker run --name redis-test-instance -p 6379:6379 -d redis
+//sudo docker run -p 4222:4222 -p 8223:8223 nats-streaming -p 4222 -m 8223
+// migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable' up
+//sudo docker exec -it e8c0fc42a2f9 /bin/bash
+//psql -U postgres
+
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
@@ -30,13 +37,6 @@ func main() {
 		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 
-	//sudo docker run --name=balance -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d --rm postgres
-	// migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable' up
-
-	//sudo docker exec -it e8c0fc42a2f9 /bin/bash
-	//psql -U postgres
-
-	//sudo docker run -p 4223:4223 -p 8223:8223 nats-streaming -p 4223 -m 8223
 	db, err := repository.NewPostgresDB(repository.ConfigPostgres{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
@@ -46,42 +46,38 @@ func main() {
 		SSLMode:  viper.GetString("db.sslmode"),
 	})
 
-	cash, err := repository.NewRedisDB(repository.ConfigRedis{
-		Host:     viper.GetString("cash.host_cash"),
-		Port:     viper.GetString("cash.port"),
-		Password: "",
-		DBName:   viper.GetInt("cash.dbname"),
-	})
 	if err != nil {
 		logrus.Fatalf("failed to inititalize db: %s", err.Error())
 	}
 
+	cache, err := repository.NewRedisDB(repository.ConfigRedis{
+		Host:     viper.GetString("cache.host_cache"),
+		Port:     viper.GetString("cache.port"),
+		Password: "",
+		DBName:   viper.GetInt("cache.dbname"),
+	})
+
+	if err != nil {
+		logrus.Fatalf("failed to inititalize cache: %s", err.Error())
+	}
+
+	natsStreaming, err := handler.NewNatsStreamingConnection(handler.ConfigNatsStreaming{
+		Host:      viper.GetString("nats-streaming.host_nats"),
+		Port:      viper.GetString("nats-streaming.port"),
+		ClusterID: viper.GetString("nats-streaming.cluster_id"),
+		ClientID:  viper.GetString("nats-streaming.client_id"),
+	})
+
+	if err != nil {
+		logrus.Fatalf("failed to connect to nats-streaming: %s", err.Error())
+	}
+
 	// dependency injection
-	repos := repository.NewRepository(db, cash)
+	repos := repository.NewRepository(db, cache)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(services, natsStreaming)
 	srv := new(server.Server)
 
-	//sc, err := stan.Connect(ClusterID, ClientID, stan.NatsURL(fmt.Sprintf("nats://%v%v", viper.GetString("db.host_nats"), Port)))
-	//if err != nil {
-	//	logrus.Fatalf("can't connect to Nats Streaming channel (subscription): %s", err)
-	//}
-	//
-	//startOpt := stan.StartAt(pb.StartPosition_NewOnly)
-	//
-	//subj, i := ":4222", 0
-	//mcb := func(msg *stan.Msg) {
-	//	i++
-	//	println(msg, i)
-	//}
-	//
-	//_, err = sc.QueueSubscribe(subj, "qgroup", mcb, startOpt, stan.DurableName(""))
-	//if err != nil {
-	//	sc.Close()
-	//	log.Fatal(err)
-	//}
-	//
-	//log.Printf("Listening o")
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logrus.Fatalf("error occured while running http server: %s", err.Error())
 	}

@@ -3,17 +3,21 @@ port: "8000"
 db:
   username: "postgres"
   host: "localhost"
-  port: "5432"
+  port: "5436"
   dbname: "postgres"
   sslmode: "disable"
 
-cash:
-  host_cash: "localhost"
+cache:
+  host_cache: "localhost"
   port: "6379"
   password: ""
   dbname: "0"
 
 nats-streaming:
-  port: 4222
   host_nats: "localhost"
+  port: 4222
+  cluster_id: "test-cluster"
+  client_id: "test-client"
+  channel_name: "order-channel"
+
 
