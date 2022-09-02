@@ -41,23 +41,24 @@ func (r *ApiPostgres) CreateOrder(order order.Order) (int, error) {
 	}
 
 	err = tx.Commit()
-
 	if err != nil {
 		value, err := json.Marshal(order)
 		if err != nil {
 			return id, err
 		}
-		r.cache.Set(string(id), value, 1000*time.Minute)
+		set := r.cache.Set(string(id), value, 1000*time.Minute)
+		if _, err := set.Result(); err == nil {
+			logrus.Println("order was added to the cache")
+		}
 	}
 
-	return id, tx.Commit()
+	return id, err
 }
 
 //GetOrderById gets order from cache or from db (and add to cache)
 func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
 	var order order.Order
 	orderCash, err := r.cache.Get(string(orderId)).Bytes()
-	fmt.Println(string(orderCash))
 	if err == nil {
 		logrus.Println("order was found in the cache")
 		err := json.Unmarshal(orderCash, &order)
@@ -72,8 +73,8 @@ func (r *ApiPostgres) GetOrderById(orderId int) (order.Order, error) {
 	}
 
 	err = json.Unmarshal([]byte(row), &order)
-	p := r.cache.Set(string(orderId), row, 1000*time.Minute)
-	if _, err := p.Result(); err == nil {
+	set := r.cache.Set(string(orderId), row, 1000*time.Minute)
+	if _, err := set.Result(); err == nil {
 		logrus.Println("order was added to the cache")
 	}
 

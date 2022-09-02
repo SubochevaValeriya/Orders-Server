@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/stan.go"
+	"github.com/nats-io/stan.go/pb"
 	"github.com/spf13/viper"
 	"http_server/pkg/service"
 )
@@ -42,7 +43,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			}
 			m.Ack()
 		},
-		stan.StartWithLastReceived())
+		stan.StartAt(pb.StartPosition_NewOnly))
 
 	return router
 }

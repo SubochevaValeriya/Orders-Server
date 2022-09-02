@@ -12,12 +12,12 @@ services:
       - cache
     environment:
       #     username: "postgres"
-      host: db
-      host_cache: cache
-      host_nats: nats-streaming
-      DB_PASSWORD: qwerty
-      DB_DSN: 'postgres://user:password@db:5432/utp'
-    networks: [ "nats" ]
+      - host=db
+      - host_cache=cache
+      - host_nats=nats-streaming
+      - DB_PASSWORD=qwerty
+     # DB_DSN: 'postgres://user:password@db:5432/utp'
+   # networks: [ "nats" ]
 
   #      port: "5432"
   #      dbname: "postgres"
@@ -35,28 +35,29 @@ services:
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: utp
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: qwerty
+      - POSTGRES_DB=utp
+      #POSTGRES_USER: user
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwerty
     ports:
       - "5432:5432"
-    networks: [ "nats" ]
+   # networks: [ "nats" ]
 
   nats-streaming:
     restart: always
     image: nats-streaming:latest
     ports:
       - "4222:4222"
-    networks: [ "nats" ]
+  #  networks: [ "nats" ]
   cache:
     image: redis:6.2-alpine
     restart: always
     ports:
       - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    #command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
       - ./cache:/data
-    networks: [ "nats" ]
-networks:
-  nats:
-    name: nats
+   # networks: [ "nats" ]
+#networks:
+ # nats:
+  #  name: nats

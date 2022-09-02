@@ -25,11 +25,8 @@ func (h *Handler) createOrder(order order.Order) {
 func validation(msg []byte) (order.Order, error) {
 	var order order.Order
 	if err := json.Unmarshal(msg, &order); err != nil {
-		fmt.Println(err)
 		return order, fmt.Errorf("unappropriate format: %w", err)
 	}
-
-	fmt.Println("from valid")
 	return order, nil
 }
 

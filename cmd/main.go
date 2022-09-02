@@ -38,7 +38,7 @@ func main() {
 	}
 
 	db, err := repository.NewPostgresDB(repository.ConfigPostgres{
-		Host:     viper.GetString("db.host"),
+		Host:     os.Getenv("host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		Password: os.Getenv("DB_PASSWORD"),
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	cache, err := repository.NewRedisDB(repository.ConfigRedis{
-		Host:     viper.GetString("cache.host_cache"),
+		Host:     os.Getenv("host_cache"),
 		Port:     viper.GetString("cache.port"),
 		Password: "",
 		DBName:   viper.GetInt("cache.dbname"),
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	natsStreaming, err := handler.NewNatsStreamingConnection(handler.ConfigNatsStreaming{
-		Host:      viper.GetString("nats-streaming.host_nats"),
+		Host:      os.Getenv("host_nats"),
 		Port:      viper.GetString("nats-streaming.port"),
 		ClusterID: viper.GetString("nats-streaming.cluster_id"),
 		ClientID:  viper.GetString("nats-streaming.client_id"),
