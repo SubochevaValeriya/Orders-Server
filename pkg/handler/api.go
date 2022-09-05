@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -23,10 +24,16 @@ func (h *Handler) createOrder(order order.Order) {
 
 //Validation of message format
 func validation(msg []byte) (order.Order, error) {
+
 	var order order.Order
 	if err := json.Unmarshal(msg, &order); err != nil {
-		return order, fmt.Errorf("unappropriate format: %w", err)
+		return order, fmt.Errorf("unappropriated format: %w", err)
 	}
+
+	if order.OrderUID == "" {
+		return order, errors.New("valid JSON, but unappropriated format")
+	}
+
 	return order, nil
 }
 
