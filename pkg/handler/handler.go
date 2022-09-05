@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/stan.go"
 	"github.com/nats-io/stan.go/pb"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"http_server/pkg/service"
 )
@@ -40,6 +41,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		func(m *stan.Msg) {
 			if order, err := validation(m.Data); err == nil {
 				h.createOrder(order)
+			} else {
+				logrus.Printf("Validation error: %s", err)
 			}
 			m.Ack()
 		},
